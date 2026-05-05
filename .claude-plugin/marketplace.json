@@ -1,0 +1,23 @@
+{
+  "name": "deck-build",
+  "owner": {
+    "name": "Tao Li",
+    "email": "litao219@gmail.com"
+  },
+  "metadata": {
+    "description": "Local marketplace for the deck-build plugin",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "deck-build",
+      "description": "Consultancy-grade .pptx generation from a reference deck. Inherits theme/colors/fonts/layout vocabulary; codifies 7 design archetypes (stage-flow, two-col-overview, spotlight-comparison, tiered-region-coverage, recommendation-hero, before-after-process, risk-heatmap) with anatomy/color/typography/icon recipes. Two-tone action title pattern + verb/word-count/weasel-word linter. Footer-clearance budget enforcement. Vision-LLM defect scan with archetype-aware prompt template. Delegates file-level pptx ops to document-skills:pptx.",
+    "author": {
+      "name": "Tao Li",
+      "email": "litao219@gmail.com"
+    },
+    "source": "./",
+    "category": "documents"
+    }
+  ]
+}

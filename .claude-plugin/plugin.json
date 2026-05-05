@@ -1,0 +1,11 @@
+{
+  "name": "deck-build",
+  "version": "0.1.0",
+  "description": "Consultancy-grade .pptx generation from a reference deck. Inherits theme, colors, fonts, and layout vocabulary. Delegates file-level pptx ops to document-skills:pptx.",
+  "author": {
+    "name": "Tao Li",
+    "email": "litao219@gmail.com"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/taoli/deck-build"
+}
