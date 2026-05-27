@@ -1,0 +1,31 @@
+{
+  "_fixture": "FLAT — the ORIGINAL pre-P1 schema: governing_thought + a flat slides[] array, with NO scqa, NO key_line, NO per-slide supports_pillar. Proves graceful degradation: storyline_check still runs (titles + governing thought exist) and logic_structure_check degrades (exit 0, never crashes).",
+  "deck_meta": {
+    "governing_thought": "Consolidate onto one platform this year to cut the close to five days",
+    "audience": "Finance leadership",
+    "reference_deck": "tests/fixtures/reference.pptx"
+  },
+  "slides": [
+    {
+      "slide_number": 1,
+      "archetype": "title-cover",
+      "title_bold": "Modernizing the monthly financial close",
+      "title_normal": null,
+      "content": {}
+    },
+    {
+      "slide_number": 2,
+      "archetype": "before-after-process",
+      "title_bold": "Consolidation cuts the close from 12 days to 5",
+      "title_normal": null,
+      "content": {"before": ["12-day close"], "after": ["5-day close"]}
+    },
+    {
+      "slide_number": 3,
+      "archetype": "recommendation-hero",
+      "title_bold": "Adopt one platform this year",
+      "title_normal": "to halve the monthly close",
+      "content": {"hero": "One platform"}
+    }
+  ]
+}

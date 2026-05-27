@@ -61,6 +61,21 @@ One cell of `I` across 48. The plugin is strong on *visual* archetype enforcemen
 (`archetype_compliance.py` + the vision audit) and on *title mechanics* — but **logical-structure**
 enforcement is essentially absent.
 
+> **Post-implementation update (2026-05-27).** P1–P6 are now implemented; the matrix above is the *pre-implementation baseline*. See `IMPLEMENTATION-LOG.md` (file:line changes) and `../tests/SMOKE-RESULTS.md` (proof: 16/16 deterministic + a judged run where the whole-deck judge PASSES the good deck and FLAGS the bad fixture). Post-state:
+>
+> | # | Criterion | Enforcing validator (deck-qa layer) | Net enforcement |
+> |---|---|---|---|
+> | 1 | Governing thought | `storyline_check.py` screen + support judge (5a) | **Validated + Gated** |
+> | 2 | SCQA intro | `storyline_check.py` (answer≈GT) + opening-arc judge (5a); scaffolder (Phase 2b) | **Validated + Gated** |
+> | 3 | Answer-first / top-down | storyline thesis-position judge (5a) + `action_title_lint --semantic` (2b) | **Validated + Gated** |
+> | 4 | Action titles | `action_title_lint.py` mechanics (2) + `--semantic` substance judge (2b) | **Validated + Gated** |
+> | 5 | Storyline read-through | `storyline_check.py` whole-deck judge (5a) | **Validated + Gated** |
+> | 6 | Vertical logic | `logic_structure_check.py` orphan/childless + judge (5b) | **Validated + Gated** |
+> | 7 | Horizontal logic | `logic_structure_check.py` logic_type/order_basis + render-order + archetype↔logic + judge (5b) | **Validated + Gated** |
+> | 8 | MECE | `logic_structure_check.py` catch-all screen + overlap/gap judge (5b) | **Validated + Gated** |
+>
+> **Before:** 1 of 8 criteria validated (action-title *mechanics* only); the four deck-level criteria (5–8) had zero executable enforcement and the data model could not even represent the pyramid. **After:** 8 of 8 reach **Validated**; the deck-level criteria (5–8) plus the judge halves of 1–3 are **Gated** into the deck-qa Layer 5 loop. The enabler was P1's structured argument tree — once the pyramid is *data*, the validators became tractable, exactly as the plan predicted.
+
 ---
 
 ## Per-criterion findings (with citations)
@@ -238,4 +253,4 @@ storyline check gated into QA, and a title linter that finally tests the so-what
 complete deck-level coverage (MECE, vertical/horizontal logic, SCQA, archetype-logic fit). P2 and P3 can
 proceed in parallel with P1 since neither strictly requires the new schema to begin.
 
-**STOP — awaiting approval before editing any plugin file.**
+**Implemented (2026-05-27)** — P1–P6 landed; see `IMPLEMENTATION-LOG.md` and `../tests/SMOKE-RESULTS.md`. The "Out-of-scope flags" above (Layer-3 brand-token validator unbuilt; stale install cache) remain open — neither is Minto, and the cache is refreshed via `/plugin marketplace update deck-build`.

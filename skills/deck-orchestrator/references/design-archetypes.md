@@ -22,6 +22,23 @@ When more than one archetype fits the claim type, prefer in this order:
 3. **Three-state visual language only when status is time-sequenced** — CURRENT/LATER/SIGN-OFF works for plan slides where boxes will move through states; do NOT use it for "scope vs out-of-scope" or for static comparisons (use spotlight instead).
 4. **Sub-callout grid when the slide has a secondary takeaway** — agenda + desired-outcome, comparison + key-finding, framework + so-what — split as primary content + sub-callout below.
 
+## Logic shape (argument fit)
+
+An archetype is not only a *visual* choice — its composition implies an **argument shape**. A sequential/causal visual asserts a deductive chain; a parallel/comparison visual asserts an inductive set. Picking an archetype whose shape fights the argument (e.g. a parallel-comparison visual for a sequential, deductive point) is a logic defect, not just a style one.
+
+| Archetype | Implied logic | Typical order basis | Why |
+|---|---|---|---|
+| `stage-flow-with-signoff` | **deductive** | time | stages run in sequence toward a gate |
+| `before-after-process` | **deductive** | time | current → future is a causal / temporal progression |
+| `process-2…5-phase`, `timeline-horizontal` | **deductive** | time | ordered steps |
+| `spotlight-comparison-columns` | **inductive** | degree / structure | parallel things, one in focus |
+| `comparison-2…5`, `cards-2…5` | **inductive** | degree / structure | parallel items of one class |
+| `tiered-region-coverage-table`, `mapping-table-with-status` | **inductive** | structure | rows × destinations, all parallel |
+| `two-col-overview-with-subcallout` | **inductive** | structure | agenda items are parallel |
+| `recommendation-hero`, `hero-statement`, `data-contrast`, `quote-hero`, `risk-heatmap`, `framework`, `pyramid` | — (single claim / positioning) | n/a | no same-level grouping → no logic constraint |
+
+**Enforced:** `scripts/logic_structure_check.py` carries this map (`ARCHETYPE_LOGIC`) and the deck-qa **Layer 5b** judge flags a slide whose archetype contradicts the `logic_type` of the pillar it supports (or its own `logic_type` override). Set a pillar's `logic_type` to match the argument, then pick an archetype whose shape agrees.
+
 ## Footer-clearance budget (renderer hard rule)
 
 A 16:9 slide is 7.5" tall. Every reference deck has a footer band — the Manulife template uses ~6.95–7.30" for logo + page number + program name. **Renderers must reserve ≥0.30" clearance from the lowest content shape to y=6.95.**

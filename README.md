@@ -66,13 +66,15 @@ Or for ephemeral dev use without permanent install: launch Claude Code with `--p
 - **deck-orchestrator** — main entry point. Pyramid Principle, action titles, archetype selection, multi-skill flow with explicit per-phase procedure.
 - **deck-extract-dna** — profile a reference deck → JSON inventory of theme + layouts + visual conventions.
 - **deck-render** — two paths: (a) layout delegation to `document-skills:pptx`, (b) raw construction via importable helper recipes for archetypes the layouts can't carry.
-- **deck-qa** — four-layer audit: vision LLM, action-title linter, brand-token validator, archetype-compliance check (footer-clearance, container-clipping, two-tone title, verb test).
+- **deck-qa** — five-layer audit: vision LLM, action-title linter (+ optional semantic so-what judge), brand-token validator, archetype-compliance check (footer-clearance, container-clipping, two-tone title, verb test), and a whole-deck **storyline & logic** judge (Minto Pyramid: governing thought, SCQA, storyline read-through, MECE, vertical/horizontal logic).
 - **deck-charts** — specialist consulting charts (Waterfall, Marimekko, Harvey Balls).
 
 ### Scripts (directly invokable, no plugin install required)
 
 - `scripts/deck_helpers.py` — importable render-helper module: archetype recipes (`two_tone_title`, `numbered_agenda_block`, `spotlight_callout`, `sub_callout_grid`), 7 simple icons, `strip_shapes` discipline, primitives.
 - `scripts/archetype_compliance.py` — runnable QA: `python archetype_compliance.py <deck.pptx> [--plan plan.json]`. Returns JSON. Exit code 0 = clean, 1 = High-severity issues.
+- `scripts/storyline_check.py` — Minto **storyline** prep (deck-qa Layer 5a): deterministic governing-thought screen + a whole-deck judge packet (criteria 1, 2, 5). `python storyline_check.py <deck-plan.json> [--manifest audit_manifest.json]`. Exit 0 = governing thought is a so-what; 1 = not.
+- `scripts/logic_structure_check.py` — Minto **logic** prep (deck-qa Layer 5b): deterministic MECE catch-all screen + vertical (orphans / childless pillars) + horizontal (`logic_type` / `order_basis`) + archetype↔logic fit, plus a whole-deck judge packet (criteria 6, 7, 8). `python logic_structure_check.py <deck-plan.json>`. Degrades gracefully (exit 0) on an old flat plan with no `key_line`.
 - `skills/deck-extract-dna/scripts/profile_template.py` — `python profile_template.py <reference.pptx> <output_dir>` → DNA JSONs.
 
 ### Archetype recipes

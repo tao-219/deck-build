@@ -1,0 +1,69 @@
+{
+  "_fixture": "BAD — governing thought is a topic (no verb); NO scqa despite a key_line; pillars overlap and include an 'Other' catch-all; topic titles; an orphan content slide; jumbled title sequence that never reaches a thesis. Must be FLAGGED deterministically (C1, C2, C4, C6, C8) AND by the whole-deck judge.",
+  "deck_meta": {
+    "governing_thought": "Tool cost overview",
+    "audience": "Finance leadership",
+    "reference_deck": "tests/fixtures/reference.pptx",
+    "key_line": [
+      {"id": "P1", "claim": "The reporting tools are expensive to run", "logic_type": "inductive", "order_basis": "degree"},
+      {"id": "P2", "claim": "Cost is the main problem with the reporting tools", "logic_type": "inductive", "order_basis": "degree"},
+      {"id": "P3", "claim": "Other considerations and risks"}
+    ]
+  },
+  "slides": [
+    {
+      "slide_number": 1,
+      "archetype": "title-cover",
+      "title_bold": "Q3 reporting tools",
+      "title_normal": null,
+      "supports_pillar": null,
+      "answers_question": null,
+      "content": {}
+    },
+    {
+      "slide_number": 2,
+      "archetype": "bullets",
+      "title_bold": "Overview",
+      "title_normal": null,
+      "supports_pillar": "P1",
+      "answers_question": null,
+      "content": {"points": ["Tool A", "Tool B", "Tool C"]}
+    },
+    {
+      "slide_number": 3,
+      "archetype": "bullets",
+      "title_bold": "Background",
+      "title_normal": null,
+      "supports_pillar": null,
+      "answers_question": null,
+      "content": {"points": ["History", "Context"]}
+    },
+    {
+      "slide_number": 4,
+      "archetype": "comparison-3",
+      "title_bold": "Findings",
+      "title_normal": null,
+      "supports_pillar": "P2",
+      "answers_question": null,
+      "content": {"columns": ["Cost", "Time", "Other"]}
+    },
+    {
+      "slide_number": 5,
+      "archetype": "before-after-process",
+      "title_bold": "Other costs and risks to consider",
+      "title_normal": null,
+      "supports_pillar": "P3",
+      "answers_question": null,
+      "content": {"notes": ["misc items", "etc"]}
+    },
+    {
+      "slide_number": 6,
+      "archetype": "closing",
+      "title_bold": "Next steps",
+      "title_normal": null,
+      "supports_pillar": null,
+      "answers_question": null,
+      "content": {}
+    }
+  ]
+}

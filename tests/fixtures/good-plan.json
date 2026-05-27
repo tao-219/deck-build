@@ -1,0 +1,84 @@
+{
+  "_fixture": "GOOD — coherent storyline, MECE key_line, action titles, SCQA + apex + per-slide linkage. Synthetic/neutral content (no client data). Must PASS every deterministic check and the whole-deck judge.",
+  "deck_meta": {
+    "governing_thought": "Consolidate onto one platform this year to cut the close to five days",
+    "audience": "Finance leadership",
+    "reference_deck": "tests/fixtures/reference.pptx",
+    "scqa": {
+      "situation": "Three regional tools run the monthly financial close today.",
+      "complication": "Vendor support for two of the three tools expires within 90 days, putting the close at risk.",
+      "question": "How do we modernize the close without slipping the year-end deadline?",
+      "answer": "Consolidate onto one platform this year to cut the close to five days."
+    },
+    "key_line": [
+      {"id": "P1", "claim": "Vendor support for two of three tools expires within 90 days, forcing action now", "logic_type": "deductive", "order_basis": "time"},
+      {"id": "P2", "claim": "One target platform covers the regional requirements out of the box", "logic_type": "inductive", "order_basis": "structure"},
+      {"id": "P3", "claim": "Consolidation cuts the close from twelve days to five", "logic_type": "deductive", "order_basis": "degree"}
+    ]
+  },
+  "slides": [
+    {
+      "slide_number": 1,
+      "archetype": "title-cover",
+      "title_bold": "Modernizing the monthly financial close",
+      "title_normal": null,
+      "supports_pillar": null,
+      "answers_question": null,
+      "content": {"subtitle": "Finance leadership review"}
+    },
+    {
+      "slide_number": 2,
+      "archetype": "content-with-image",
+      "title_bold": "Three regional tools cover the monthly close today",
+      "title_normal": null,
+      "supports_pillar": "P1",
+      "answers_question": "What is the starting point?",
+      "content": {"points": ["Region A tool", "Region B tool", "Region C tool"]}
+    },
+    {
+      "slide_number": 3,
+      "archetype": "data-contrast",
+      "title_bold": "Vendor support for two of three tools expires within 90 days",
+      "title_normal": null,
+      "supports_pillar": "P1",
+      "answers_question": "What forces a change now?",
+      "content": {"metric": "90 days", "label": "until support ends for 2 of 3 tools"}
+    },
+    {
+      "slide_number": 4,
+      "archetype": "recommendation-hero",
+      "title_bold": "Consolidate onto one platform this year",
+      "title_normal": "to cut the close to five days",
+      "supports_pillar": "governing_thought",
+      "answers_question": "What do we recommend?",
+      "content": {"hero": "Adopt one platform in this fiscal year", "cards": ["Acts before support ends", "Covers every region", "Halves close time"]}
+    },
+    {
+      "slide_number": 5,
+      "archetype": "tiered-region-coverage-table",
+      "title_bold": "The target platform covers 90% of regional requirements",
+      "title_normal": "out of the box",
+      "supports_pillar": "P2",
+      "answers_question": "Can one platform cover every region?",
+      "content": {"rows": ["Region A", "Region B", "Region C", "Region D"]}
+    },
+    {
+      "slide_number": 6,
+      "archetype": "before-after-process",
+      "title_bold": "Consolidation cuts the close from 12 days to 5",
+      "title_normal": null,
+      "supports_pillar": "P3",
+      "answers_question": "What is the payoff?",
+      "content": {"before": ["12-day close"], "after": ["5-day close"]}
+    },
+    {
+      "slide_number": 7,
+      "archetype": "closing",
+      "title_bold": "The team consolidates onto one platform by year-end",
+      "title_normal": null,
+      "supports_pillar": null,
+      "answers_question": null,
+      "content": {"next_steps": ["Confirm platform", "Plan migration"]}
+    }
+  ]
+}

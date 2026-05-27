@@ -69,6 +69,13 @@ Common MECE failures:
 - **So-what test**: for each slide, what's the conclusion? If the title doesn't state it, fix the title.
 - **Pyramid test**: does each pillar's evidence actually support the pillar? Does each pillar actually support the governing thought?
 
+> **These tests are enforced, not just advisory.** They read the structured argument tree (`deck_meta.scqa` / `key_line` / per-slide `supports_pillar`) that deck-orchestrator Phase 2 emits:
+> - The **Title test** (storyline read-through) and the **so-what test** run in deck-qa **Layer 5a** via `scripts/storyline_check.py`.
+> - The **MECE check** (catch-all screen + overlap/gap judge) and the **Pyramid test** (vertical & horizontal logic) run in **Layer 5b** via `scripts/logic_structure_check.py`.
+> - Action-title **so-what substance** runs in **Layer 2b** via `action_title_lint.py --semantic`.
+>
+> See `_minto/minto-rubric.md` for the pass-conditions and `_minto/minto-gap-analysis.md` for the enforcement map.
+
 ## Anti-patterns
 
 - Burying the lead (governing thought in slide 18 instead of slide 2).

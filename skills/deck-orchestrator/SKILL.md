@@ -47,11 +47,24 @@ Main entry point. Coordinates the five-skill flow:
 
 ### Phase 2: Structure the argument (autonomous)
 
-4. **Apply Pyramid Principle.**
-   - State the governing thought in one sentence (the deck's "so-what").
-   - Decompose into 3–5 MECE supporting pillars.
-   - Order pillars by SCQA: Situation → Complication → Question → Answer.
-5. **Sketch the slide list.** One slide per pillar (or per sub-pillar if a pillar needs >1 slide). Plus title-cover, agenda, closing/next-steps as bookends.
+4. **Apply Pyramid Principle — capture the argument as DATA, not just prose.** The pyramid is an inspectable artifact that downstream validators (`storyline_check.py`, `logic_structure_check.py`) read back, so build it as structured fields in the plan, not as transient reasoning:
+   - **Governing thought** — one sentence, the deck's "so-what". A so-what *assertion* (verb present, ≤ 25 words, states a position/recommendation), never a topic label. → `deck_meta.governing_thought`.
+   - **SCQA arc** — draft Situation → Complication → Question → Answer explicitly; `answer` must be the governing thought. → `deck_meta.scqa` (see Phase 2b for the scaffolder).
+   - **Key line (pillars)** — decompose into 3–5 MECE supporting pillars. For EACH pillar capture: a stable `id`, the `claim` it asserts, its `logic_type` (`deductive` = premise → premise → conclusion, **or** `inductive` = parallel items of one class), and its `order_basis` (`time` | `structure` | `degree`). → `deck_meta.key_line[]`.
+   - **MECE discipline** — pillars must not overlap and must cover the relevant universe. No "Other / Miscellaneous / etc." catch-all; state any deliberate exclusion explicitly ("out of scope: X").
+5. **Sketch the slide list and tag each slide to the pyramid.** One slide per pillar (or per sub-pillar if a pillar needs >1 slide). Plus title-cover, the SCQA opening (agenda / context), closing/next-steps as bookends. For each CONTENT slide, record which pillar it serves (`supports_pillar` = a `key_line.id`) and the question it answers (`answers_question`). Structural slides (title-cover, section-divider, closing) carry `supports_pillar: null`.
+
+### Phase 2b: Scaffold the SCQA opening (autonomous)
+
+Turn the governing thought into an opening the audience can follow. This is the **generator** for `deck_meta.scqa` and the first content slides — SCQA is the weakest-supported Minto criterion when skipped, so draft it explicitly rather than letting it stay implicit:
+
+- **Draft S → C → Q → A as data** (populate `deck_meta.scqa`):
+  - **Situation** — a factual baseline the audience already accepts (no tension yet).
+  - **Complication** — the change / threat / opportunity that makes the Situation unsustainable. It must be a *genuine new tension*, not a restatement of the Situation.
+  - **Question** — the question the Complication forces. May stay implicit for the compressed SCR shape (then carry the resolution in `answer`).
+  - **Answer** — the resolution. **The Answer must be the governing thought** (`scqa.answer` == `deck_meta.governing_thought`).
+- **Generate the opening 1–3 slides from the arc.** Map Situation → Complication → (Question) → Answer onto the first content slides *in that order*, so the audience reaches the recommendation already primed. The Answer/recommendation slide lands within the first ~20% of content slides (answer-first) — never buried in the back half.
+- **Self-check before Phase 3:** Is the Complication a real tension (not a paraphrase of the Situation)? Does the Answer appear up front? Is the Answer the governing thought? The deck-qa **Layer 5a** judge re-checks all three (`storyline_check.py` carries the deterministic `answer ≈ governing_thought` proxy + the opening-arc judge) — fix them here, not at QA.
 
 ### Phase 3: Plan each slide (autonomous)
 
@@ -68,6 +81,7 @@ For EACH slide:
    - For `two-col-overview-with-subcallout`: left-column purpose + objectives, 4 numbered agenda items, 2–3 desired-outcome callouts.
    - For `spotlight-comparison-columns`: focus column, context columns, scope qualifier per column, focus-marker label, per-column footer content.
    - For each archetype, see its anatomy section in `design-archetypes.md`.
+   - **Pyramid linkage:** set `supports_pillar` (the `key_line.id` this slide defends) and `answers_question` (the specific question it answers for that pillar). A content slide with no pillar is an orphan — assign it or cut it.
 
 ### Phase 4: Emit and approve plan (gate — STOP for user approval)
 
@@ -79,7 +93,18 @@ For EACH slide:
     "governing_thought": "...",
     "audience": "...",
     "reference_deck": "<path>",
-    "reference_dna": "<path to reference-dna.json>"
+    "reference_dna": "<path to reference-dna.json>",
+    "scqa": {
+      "situation": "factual baseline the audience already accepts",
+      "complication": "the change / tension that makes the situation unsustainable",
+      "question": "the question the complication raises (may be null for the compressed SCR shape)",
+      "answer": "the resolution — MUST be the governing thought"
+    },
+    "key_line": [
+      {"id": "P1", "claim": "first pillar — a full assertion", "logic_type": "inductive", "order_basis": "degree"},
+      {"id": "P2", "claim": "second pillar — a full assertion", "logic_type": "inductive", "order_basis": "degree"},
+      {"id": "P3", "claim": "third pillar — a full assertion",  "logic_type": "inductive", "order_basis": "degree"}
+    ]
   },
   "slides": [
     {
@@ -87,6 +112,8 @@ For EACH slide:
       "archetype": "title-cover",
       "title_bold": "...",
       "title_normal": null,
+      "supports_pillar": null,
+      "answers_question": null,
       "content": {...}
     },
     {
@@ -94,6 +121,8 @@ For EACH slide:
       "archetype": "two-col-overview-with-subcallout",
       "title_bold": "Today's session",
       "title_normal": "identify Canada CRR pain points and assess SAI built-in coverage to inform Workshop 2",
+      "supports_pillar": "P1",
+      "answers_question": "What will today's session produce?",
       "content": {
         "left": {"purpose": "...", "objectives": ["...", "..."]},
         "agenda": [{"n": 1, "topic": "..."}, ...],
@@ -107,7 +136,9 @@ For EACH slide:
 }
 ```
 
-10. **Present the plan to the user for approval.** Show: governing thought + slide list with action titles + per-slide archetype. Stop and wait for approval, modification, or rejection before proceeding. **STOP HERE.**
+> **Schema is additive / back-compatible.** `deck_meta.scqa`, `deck_meta.key_line`, and the per-slide `supports_pillar` / `answers_question` extend the original flat schema. `logic_type` ∈ `{deductive, inductive}`; `order_basis` ∈ `{time, structure, degree}`. `supports_pillar` is a `key_line.id` for an evidence slide, `null` for a structural slide (cover / divider / closing), or the literal `"governing_thought"` for the **apex** slide that presents the thesis (the SCQA Answer / recommendation) — the apex sits above the pillars, so it is exempt from the orphan check. A slide may carry an optional `logic_type` to override its pillar's (used by the archetype↔logic check). A plan that omits these fields still renders, and the Minto validators (`storyline_check.py`, `logic_structure_check.py`) **degrade gracefully** — they warn and skip the affected check rather than fail on an older flat plan.
+
+10. **Present the plan to the user for approval — show the pyramid, not just the slide list.** Render: the governing thought; the SCQA arc (S → C → Q → A); the key-line pillars; then the slide list grouped under the pillar each slide supports (with its action title + archetype). The user is approving the **argument structure**, not just slide ordering. Stop and wait for approval, modification, or rejection before proceeding. **STOP HERE.**
 
 ### Phase 5: Render (post-approval)
 

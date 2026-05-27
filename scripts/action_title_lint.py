@@ -13,14 +13,23 @@ Walks every slide in a .pptx, extracts the title, and applies the rules from
   R7 — Not a topic title (heuristic: lacks a verb AND looks like a noun phrase)
 
 Usage:
-  python action_title_lint.py <deck.pptx> [--quiet]
+  python action_title_lint.py <deck.pptx> [--plan plan.json] [--semantic] [--quiet]
 
 Exit code: 0 if no Major issues, 1 otherwise. Each issue carries Major/Minor.
 JSON output to stdout; human summary to stderr unless --quiet.
 
+`--semantic` adds a substance tier: the deterministic rules are string heuristics
+(verb + length), so they cannot test assertion + so-what (see the note at line ~70).
+With --semantic the script ALSO emits a `semantic_judge_packet` (JSON + a ready-to-run
+prompt) scoring each title on assertion-vs-label, presence-of-so-what, and the operative
+number on quantitative slides. The judge itself runs from deck-qa Layer 2 via the Agent
+tool — no API call here. The cheap deterministic screen still sets the exit code / gates.
+
 Importable: other QA scripts can `from action_title_lint import (
-    extract_title, lint_title, BANNED_WEASEL_WORDS, KNOWN_VERBS
-)` to share the rules.
+    extract_title, lint_title, has_verb, has_two_tone, tokenize,
+    is_topic_title, build_semantic_packet,
+    BANNED_WEASEL_WORDS, KNOWN_VERBS, STRUCTURAL_ARCHETYPES, QUANTITATIVE_ARCHETYPES
+)` to share the rules and archetype classification.
 """
 
 import argparse
@@ -131,6 +140,22 @@ TOPIC_HEADWORDS = {
     "agenda", "goals", "objectives", "scope", "context",
     "considerations", "recommendations", "next", "steps",
     "outline", "outlook",
+}
+
+# Archetype classification — defined here (the base, dependency-free module) so the
+# Minto validators (storyline_check.py, logic_structure_check.py) import one copy.
+# Structural slides carry no argument title: skipped by the semantic so-what judge
+# and discounted from storyline/logic checks.
+STRUCTURAL_ARCHETYPES = {
+    "title-cover", "section-divider", "closing", "contact", "divider",
+}
+
+# Archetypes whose slides are inherently quantitative — the semantic judge expects
+# the operative number in the title (rubric Criterion 4).
+QUANTITATIVE_ARCHETYPES = {
+    "tiered-region-coverage-table", "mapping-table-with-status", "risk-heatmap",
+    "data-contrast", "chart-bar", "chart-line", "chart-quadrant", "chart-scatter",
+    "chart-waterfall", "chart-marimekko", "harvey-balls",
 }
 
 
@@ -449,10 +474,95 @@ def audit_deck(deck_path):
     }
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Semantic tier (--semantic) — assertion + so-what judge packet
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# The deterministic rules above are string heuristics: they test verb + length,
+# not assertion + so-what (action_title_lint.py:70). A verb-bearing non-assertion
+# ("The team will discuss next steps") or a vacuous claim passes the cheap screen
+# clean. `--semantic` emits a judge packet so an LLM-judge (run from deck-qa Layer
+# 2, NOT here) closes that depth gap. The cheap screen still gates via exit code.
+
+def _has_digit(text):
+    return any(ch.isdigit() for ch in (text or ""))
+
+
+def build_semantic_prompt(titles):
+    """Self-contained per-title substance prompt for the Layer-2 judge."""
+    listing = "\n".join(
+        f'  {t["slide_number"]}. "{t["title"]}"'
+        f'{"  [quantitative — number expected]" if t["quantitative"] else ""}'
+        for t in titles
+    ) or "  (no content titles found)"
+    return f"""You are a strict consulting editor judging slide titles for SUBSTANCE. \
+The deterministic linter already passed verb + word-count + weasel + passive mechanics \
+— do NOT re-check those. Judge only whether each title is a genuine action title.
+
+A title PASSES only if BOTH hold:
+  - ASSERTION, not a label — it stakes a claim/position. A grammatically complete \
+NON-statement fails ("The team will discuss next steps", "We reviewed the data"): a \
+verb is present but no conclusion is asserted. A vacuous claim fails ("Results show results").
+  - SO-WHAT present — a reader learns the slide's actual conclusion from the title alone.
+And for a title marked [quantitative]: the operative NUMBER must appear in the title.
+
+Titles:
+{listing}
+
+Per `minto-rubric.md` Criterion 4: ≥ 90% of content titles must pass; ANY \
+topic-label-that-merely-carries-a-verb is a fail.
+
+Output JSON only, no prose:
+{{
+  "pass": true|false,
+  "pass_rate": <0.0-1.0>,
+  "titles": [
+    {{"slide": <int>, "verdict": "assertion|label|vacuous|missing-number",
+      "pass": true|false, "why": "...", "suggested_rewrite": "..."}}
+  ]
+}}
+"pass" is false if pass_rate < 0.90 OR any title is a label-with-a-verb. Judge what is \
+written; do not invent titles."""
+
+
+def build_semantic_packet(deck_path, plan_archetypes=None):
+    """Walk the deck, drop structural slides, and assemble the substance judge packet.
+
+    Deterministic prep only — emits JSON + prompt; the judge runs from deck-qa Layer 2.
+    """
+    plan_archetypes = plan_archetypes or {}
+    prs = Presentation(str(deck_path))
+    titles = []
+    for i, slide in enumerate(prs.slides, 1):
+        archetype = plan_archetypes.get(i, "default")
+        if archetype in STRUCTURAL_ARCHETYPES:
+            continue
+        text, _ = extract_title(slide)
+        if not text:
+            continue
+        titles.append({
+            "slide_number": i,
+            "title": text,
+            "archetype": archetype,
+            "quantitative": archetype in QUANTITATIVE_ARCHETYPES or _has_digit(text),
+        })
+    return {
+        "mode": "per-title (Layer 2 substance tier)",
+        "criteria": [3, 4],
+        "data": {"titles": titles},
+        "prompt": build_semantic_prompt(titles),
+    }
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("deck", help="Path to .pptx to audit")
+    parser.add_argument("--plan", help="Optional plan.json (maps slide_num → archetype; "
+                                       "lets --semantic skip structural slides + flag quantitative ones)")
+    parser.add_argument("--semantic", action="store_true",
+                        help="Also emit a substance judge packet (assertion / so-what / number) "
+                             "for the deck-qa Layer-2 judge. The deterministic screen still gates.")
     parser.add_argument("--quiet", action="store_true",
                         help="Only print JSON, not human summary")
     args = parser.parse_args()
@@ -462,14 +572,31 @@ def main():
         print(f"ERROR: {deck_path} does not exist", file=sys.stderr)
         sys.exit(2)
 
+    plan_archetypes = {}
+    if args.plan:
+        plan_path = Path(args.plan)
+        if plan_path.exists():
+            with open(plan_path) as f:
+                plan_data = json.load(f)
+            for slide_spec in plan_data.get("slides", []):
+                idx = slide_spec.get("slide_number") or slide_spec.get("index")
+                if idx is not None:
+                    plan_archetypes[int(idx)] = slide_spec.get("archetype", "default")
+
     result = audit_deck(deck_path)
+    if args.semantic:
+        result["semantic_judge_packet"] = build_semantic_packet(deck_path, plan_archetypes)
     print(json.dumps(result, indent=2))
 
     if not args.quiet:
         major = sum(1 for i in result["issues"] if i["severity"] == "Major")
         minor = sum(1 for i in result["issues"] if i["severity"] == "Minor")
+        extra = ""
+        if args.semantic:
+            extra = (f"; semantic packet: {len(result['semantic_judge_packet']['data']['titles'])} "
+                     f"content title(s) for the Layer-2 judge")
         print(f"\n--- Summary: {len(result['issues'])} issues "
-              f"({major} Major, {minor} Minor) ---", file=sys.stderr)
+              f"({major} Major, {minor} Minor){extra} ---", file=sys.stderr)
 
     sys.exit(1 if any(i["severity"] == "Major" for i in result["issues"]) else 0)
 

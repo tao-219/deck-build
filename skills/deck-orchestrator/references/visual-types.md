@@ -90,6 +90,7 @@ The "(recipe)" tag signals an archetype with a full anatomy/color/icon recipe in
 4. **`bullets` is the fallback.** If no other visual type fits, use `bullets` — but reconsider whether the slide can be rewritten as a `framework` or `cards-N`.
 5. **Spotlight beats three-state when status isn't time-sequenced.** If you're tempted to color one column "CURRENT" and others "LATER" but the others are scope qualifiers (not future phases), use `spotlight-comparison-columns` instead.
 6. **Block-list beats time-boxed table for executive audiences.** Numbered agenda blocks (`two-col-overview-with-subcallout`) for execs; T+0/T+7 tables for ops reviews.
+7. **Match the archetype's logic shape to the argument.** Sequential / causal points want a **deductive** shape (`before-after-process`, `process-N-phase`, `stage-flow-with-signoff`, `timeline-horizontal`); parallel sets want an **inductive** shape (`comparison-N`, `cards-N`, `spotlight-comparison-columns`, the coverage / mapping tables). See "Logic shape (argument fit)" in `design-archetypes.md` — `logic_structure_check.py` (deck-qa Layer 5b) flags an archetype that contradicts the `logic_type` of the pillar its slide supports.
 
 ## Capability fallback
 
