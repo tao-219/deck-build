@@ -27,6 +27,24 @@ when a judge of the right kind actually runs.
 
 ---
 
+## Posture: decision vs discovery
+
+A deck declares `deck_meta.posture` = **decision** or **discovery**, mirroring the
+`workshop-deck-review` skill's Step 8 classification. Validators read it and apply the answer-first
+conditions accordingly:
+
+- **Decision / convergence** (recommendation readouts, sponsor decisions): lead with the answer.
+  Criteria 1–8 apply in full.
+- **Discovery / exploration** (kickoff, current-state, working-session decks): the deck legitimately
+  explores rather than asserting a recommendation. The **answer-first / answer-lands** conditions
+  relax — Criterion 2's up-front Answer, Criterion 3's deck-level answer-first position, and Criterion
+  5's "builds to a recommendation." Do **not** flag a discovery deck for "burying the lead."
+- **Both postures** must still pass: a present governing thought (Criterion 1 — in discovery it may be
+  the question under exploration, not a recommendation), action titles (4), storyline coherence (5),
+  and vertical / horizontal logic and MECE (6–8).
+
+---
+
 ## Criterion 1 — Governing thought
 
 **Definition.** The deck has exactly one main message; everything in it exists to support that message.
@@ -61,6 +79,10 @@ Answer (or the compressed SCR), so the audience arrives at the answer already pr
 - The first 1–3 content slides instantiate that arc in order: a Situation the audience accepts → a
   Complication that destabilizes it → (Question) → the Answer/recommendation.
 
+**Posture.** Decision-posture condition. In discovery the up-front Answer relaxes (the `answer` may be
+the open question, not a recommendation) — Situation → Complication → Question is still expected. See
+the Posture section.
+
 **How to test.**
 - *Deterministic:* the four (or three) SCQA fields exist and are non-empty; `answer` ≈ `governing_thought`.
 - *LLM-judge:* "Do the opening slides move Situation → Complication → Question → Answer without skipping
@@ -81,6 +103,10 @@ and at every slide (title states the takeaway; body defends it).
   ~20% of content slides (after SCQA setup), never buried in the back half.
 - *Slide level:* for every content slide, the **title states the slide's conclusion** and the body
   supplies support for *that* conclusion (body does not introduce a different, unstated takeaway).
+
+**Posture.** The deck-level answer-first position is decision-posture only and relaxes for discovery
+decks (no recommendation to front-load); see the Posture section. The slide-level rule (title states
+the slide's conclusion) applies to both.
 
 **How to test.**
 - *Deterministic (deck):* index of the recommendation/governing-thought slide ≤ ceil(0.2 × N_content).
@@ -125,6 +151,9 @@ lands the governing thought. *(Minto's "Title test".)*
   prior ones; there are no non-sequiturs and no missing links.
 - The sequence demonstrably builds to (and is consistent with) `governing_thought`.
 - Removing any single title would break the chain (no purely decorative titles).
+
+**Posture.** Coherence applies to both postures; in discovery the chain builds to the session's
+question / objective rather than a recommendation. See the Posture section.
 
 **How to test.**
 - *LLM-judge over the whole sequence (NOT per-slide):* feed the ordered title list + governing thought;
